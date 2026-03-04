@@ -1,0 +1,363 @@
+<!doctype html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>AUXILIO BY BIEL</title>
+    <style>
+        /* Reset e Remoção de Realce do Navegador */
+        * {
+            -webkit-tap-highlight-color: transparent;
+            outline: none !important;
+        }
+
+        body {
+            background-color: #000000;
+            color: white;
+            margin: 0;
+            overflow: hidden;
+            font-family: 'Segoe UI', Roboto, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            user-select: none;
+        }
+
+        #bg-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: -1;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 360px;
+            z-index: 10;
+        }
+
+        /* TELA DE LOGIN MANTÉM O ESTILO ORIGINAL */
+        .login-box {
+            background: rgba(18, 18, 18, 0.95);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid #1f1f1f;
+            box-shadow: 0 0 25px rgba(157, 0, 255, 0.2);
+            text-align: center;
+        }
+
+        /* PAINEL PRINCIPAL COM BORDAS ROSA ESCURO */
+        .menu {
+            background: rgba(18, 18, 18, 0.95);
+            border-radius: 12px;
+            padding: 20px;
+            border: 2px solid #800040; /* ROSA ESCURO NAS BORDAS */
+            box-shadow: 0 0 25px rgba(128, 0, 64, 0.3);
+            text-align: center;
+        }
+
+        .menu-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #ffffff;
+            margin: 10px 0;
+            text-transform: uppercase;
+        }
+
+        /* LINHA ROXA PADRÃO */
+        .linha-roxa {
+            height: 2px;
+            background: #9D00FF;
+            width: 100%;
+            margin: 10px 0;
+            box-shadow: 0 0 12px rgba(157, 0, 255, 0.7);
+        }
+
+        /* ESTILO DO NOME FOV EM CIMA DA BARRA */
+        .fov-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 15px;
+            margin-bottom: 5px;
+            font-size: 13px;
+            font-weight: bold;
+            color: #ccc;
+        }
+
+        .login-img {
+            width: 85px;
+            height: 85px;
+            border-radius: 50%;
+            border: 2px solid #9D00FF;
+            margin-bottom: 15px;
+            object-fit: cover;
+        }
+
+        .tabs {
+            display: flex;
+            background: #1a1a1a;
+            border-radius: 8px;
+            padding: 4px;
+            gap: 5px;
+            margin-bottom: 15px;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 10px;
+            background: transparent;
+            border: none;
+            color: #888;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .tab.active {
+            background: #9D00FF;
+            color: white;
+        }
+
+        .checkbox, .radio {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 14px 0;
+            cursor: pointer;
+            font-size: 15px;
+        }
+
+        input[type="checkbox"], input[type="radio"] {
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            background: #2a2a2a;
+            border-radius: 4px;
+            cursor: pointer;
+            position: relative;
+            border: 1px solid #333;
+        }
+
+        input[type="radio"] { border-radius: 50%; }
+        input:checked { background: #9D00FF; border-color: #9D00FF; }
+        
+        input:checked::after {
+            content: "✔";
+            font-size: 12px;
+            color: white;
+            position: absolute;
+            left: 3px;
+            top: 0px;
+        }
+
+        .slider-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .slider {
+            flex: 1;
+            appearance: none;
+            height: 4px;
+            background: #2a2a2a;
+            border-radius: 10px;
+        }
+
+        .slider::-webkit-slider-thumb {
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            background: #9D00FF;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 0 8px #9D00FF;
+        }
+
+        .combobox {
+            width: 100%;
+            padding: 12px;
+            background: #1a1a1a;
+            color: white;
+            border: 1px solid #9D00FF;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        .btn-main {
+            width: 100%;
+            padding: 14px;
+            background: #9D00FF;
+            color: white;
+            font-size: 16px;
+            font-weight: 800;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            text-transform: uppercase;
+        }
+
+        .input-login {
+            width: 100%;
+            padding: 12px;
+            background: #1a1a1a;
+            border: 1px solid #2a2a2a;
+            border-radius: 8px;
+            color: white;
+            margin-top: 10px;
+            margin-bottom: 15px;
+            box-sizing: border-box;
+            text-align: center;
+        }
+
+        #painelPrincipal { display: none; }
+    </style>
+</head>
+<body>
+
+    <canvas id="bg-canvas"></canvas>
+
+    <div class="container" id="telaLogin">
+        <div class="login-box">
+            <img src="https://i.postimg.cc/htLR4Pnr/IMG-20260302-WA0511.jpg" class="login-img">
+            <div class="linha-roxa"></div>
+            <div class="menu-title">BIEL</div>
+            <input type="password" id="passInput" class="input-login" placeholder="Digite a Senha">
+            <button class="btn-main" onclick="validarLogin()">Acessar Painel</button>
+        </div>
+    </div>
+
+    <div class="container" id="painelPrincipal">
+        <div class="menu">
+            <div class="menu-title">AUXILIO BY @BIEL
+                
+            </div>
+            <div class="linha-roxa"></div> 
+            
+            <div class="tabs">
+                <button class="tab active" id="btn-aim" onclick="showTab('aimbot')">Aimbot</button>
+                <button class="tab" id="btn-info" onclick="showTab('info')">Info</button>
+            </div>
+
+            <div class="content">
+                <div id="aimbotTab">
+                    <label class="checkbox"><input type="checkbox"> Ativar Auxílio</label>
+                    <label class="checkbox"><input type="checkbox" checked> Ativar Fov</label> <div class="fov-header">
+                        <span>AJUSTE DE FOV</span>
+                        <span style="color:#9D00FF;" id="fovValue">60</span> </div>
+
+                    <div class="slider-container">
+                        <input type="range" min="0" max="180" value="60" class="slider" id="fovSlider"> </div>
+
+                    <select class="combobox">
+                        <option>Auxilio Head</option>
+                        <option>Auxilio Recoil</option>
+                        <option>Auxilio Sensi</option>
+                    </select>
+
+                    <div class="linha-roxa"></div>
+                    <div style="text-align: center; font-size: 13px; color: #fff; margin: 10px 0;">Tipo de Aimbot:</div>
+                    <div style="display: flex; justify-content: space-around;">
+                        <label class="radio"><input type="radio" name="aimT"> Ao Atirar</label>
+                        <label class="radio"><input type="radio" name="aimT"> Ao Olhar</label>
+                    </div>
+                </div>
+
+                <div id="infoTab" style="display: none;">
+                    <p style="text-align: left;">Dispositivo: <span id="device" style="color:#9D00FF">Detectando...</span></p>
+                    <div class="linha-roxa"></div>
+                    <p style="font-size: 12px; color: #888; text-align: center;">Premium Mod - LuxeCheats</p>
+                </div>
+            </div>
+
+            <button class="btn-main" style="margin-top: 20px;" id="btnInject" onclick="inject()">Injetar Funções no Jogo</button>
+        </div>
+    </div>
+
+    <script>
+        function validarLogin() {
+            const pass = document.getElementById('passInput').value;
+            if(pass === "BIEL") {
+                document.getElementById('telaLogin').style.display = 'none';
+                document.getElementById('painelPrincipal').style.display = 'block';
+            } else {
+                document.getElementById('passInput').value = "";
+                document.getElementById('passInput').placeholder = "SENHA INCORRETA!";
+            }
+        }
+
+        function showTab(t) {
+            document.getElementById('aimbotTab').style.display = (t === 'aimbot') ? 'block' : 'none';
+            document.getElementById('infoTab').style.display = (t === 'info') ? 'block' : 'none';
+            document.getElementById('btn-aim').className = (t === 'aimbot') ? 'tab active' : 'tab';
+            document.getElementById('btn-info').className = (t === 'info') ? 'tab active' : 'tab';
+        }
+
+        document.getElementById('fovSlider').addEventListener('input', function() {
+            document.getElementById('fovValue').innerText = this.value;
+        });
+
+        function inject() {
+            const btn = document.getElementById('btnInject');
+            btn.innerText = "INJETANDO...";
+            setTimeout(() => {
+                btn.innerText = "SUCESSO!";
+                window.location.href = "freefireth://";
+                setTimeout(() => { btn.innerText = "Injetar Funções no Jogo"; }, 3000);
+            }, 2000);
+        }
+
+        const canvas = document.getElementById('bg-canvas');
+        const ctx = canvas.getContext('2d');
+        let pts = [];
+
+        function init() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            pts = [];
+            for(let i=0; i<120; i++) {
+                pts.push({
+                    x: Math.random()*canvas.width,
+                    y: Math.random()*canvas.height,
+                    vx: (Math.random()-0.5)*1.2,
+                    vy: (Math.random()-0.5)*1.2
+                });
+            }
+        }
+
+        function draw() {
+            ctx.clearRect(0,0,canvas.width,canvas.height);
+            ctx.fillStyle = "#9D00FF";
+            for(let i=0; i<pts.length; i++) {
+                let p = pts[i];
+                p.x += p.vx; p.y += p.vy;
+                if(p.x<0 || p.x>canvas.width) p.vx *= -1;
+                if(p.y<0 || p.y>canvas.height) p.vy *= -1;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, 2, 0, Math.PI*2);
+                ctx.fill();
+                for(let j=i+1; j<pts.length; j++) {
+                    let p2 = pts[j];
+                    let dist = Math.hypot(p.x-p2.x, p.y-p2.y);
+                    if(dist < 100) {
+                        ctx.strokeStyle = `rgba(157, 0, 255, ${1 - dist/100})`;
+                        ctx.lineWidth = 0.6;
+                        ctx.beginPath();
+                        ctx.moveTo(p.x, p.y);
+                        ctx.lineTo(p2.x, p2.y);
+                        ctx.stroke();
+                    }
+                }
+            }
+            requestAnimationFrame(draw);
+        }
+
+        window.addEventListener('resize', init);
+        init(); draw();
+        document.getElementById('device').innerText = /Android/.test(navigator.userAgent) ? "AUXILIO VALIDADO" : "iOS / Emulator";
+    </script>
+</body>
+  </html>
